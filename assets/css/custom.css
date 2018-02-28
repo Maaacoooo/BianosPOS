@@ -1,0 +1,36 @@
+    .img-thumbnail {
+      width:100px;
+      height:80px;
+    }
+    #sidebar-main {
+      background-color: #111;
+    }
+    .navbar {
+      background-color: #111;
+    }
+    ul {
+      /*background-color: transparent !important;*/ 
+    }
+    #img-cute {
+      width: 60px;
+
+    }
+    .logo {
+      color: white !important;
+
+    }
+    .navbar {
+      background: black !important;
+    }
+    header.main-header, header.main-header {
+      background-color: black !important;
+      border-bottom: 5px solid green !important;
+    }
+    .navbar a:hover {
+      background: none !important;
+    }
+    .input-group .form-control {
+      margin-top: 2px;
+      margin-bottom: 2px;
+    }
+
