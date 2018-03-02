@@ -98,6 +98,16 @@
     }
 
 
+   function moneytize($digits, $currency = NULL) {
+
+        if(is_null($currency)) {
+            $currency = APP_CURRENCY; //system defaults 
+        }
+        $digits = number_format($digits, 2, '.', ',');
+        return $currency . ' ' . $digits;
+    }
+
+
   
 
 
