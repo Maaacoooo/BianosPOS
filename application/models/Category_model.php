@@ -106,10 +106,10 @@ Class Category_Model extends CI_Model {
      * @param  [type] $id [description]
      * @return [type]     [description]
      */
-    function fetch_inventory($limit, $id, $category) {
+    function fetch_inventory($limit, $id, $category, $is_deleted = 0) {
 
             $this->db->join('item_inventory', 'item_inventory.item_id = items.id', 'left');
-            $this->db->group_by('item_inventory.item_id');
+            $this->db->group_by('items.id');            
             $this->db->select('
                 items.id,
                 items.name,
@@ -123,6 +123,7 @@ Class Category_Model extends CI_Model {
             $this->db->limit($limit, (($id-1)*$limit));            
             $this->db->where('items.category', $category);
 
+            $this->db->where('items.is_deleted', $is_deleted);
             $query = $this->db->get("items");
 
             if ($query->num_rows() > 0) {
@@ -132,13 +133,11 @@ Class Category_Model extends CI_Model {
 
     }
 
-    function count_inventory($category) {
-        $this->db->join('items', 'items.id = item_inventory.item_id', 'left');
-        $this->db->group_by('item_inventory.item_id');
-        $this->db->where('items.is_deleted', 0);
+    function count_inventory($category, $is_deleted = 0) {
+        $this->db->group_by('items.id');
+        $this->db->where('items.is_deleted', $is_deleted);
         $this->db->where('items.category', $category);
-        $this->db->select('items.id'); 
-        return $this->db->count_all_results("item_inventory");
+        return $this->db->count_all_results("items");
     }
 
 
