@@ -27,12 +27,20 @@
                             <h3 class="page-title">Batch <?=$batch['batch_id']?></h3>
                         </div>
                     </div>
+
+                    <ol class="breadcrumb">
+                        <li><a href="<?=base_url('items')?>">Items</a></li>
+                        <li><a href="<?=base_url('items/view/'.$info['id'])?>"><?=$info['name']?></a></li>
+                        <li><a href="<?=base_url('items/inventory')?>">Inventory</a></li>
+                        <li class="active"><?=$title?></li>
+                    </ol><!-- /.breadcrumb -->
+
                     <div class="row">
                         <div class="col-lg-12">
                           <?=$this->sessnotif->showNotif()?>
                         </div><!-- /.col-xs-12 -->
                       </div><!-- /.row -->
-
+    
 
                     <div class="row">
                         <div class="col-sm-4">
@@ -42,9 +50,9 @@
                                         <tr>
                                             <th colspan="2">
                                                 <?php if ($info['img']): ?>
-                                                    <img src="<?=base_url('/uploads/'. $info['img'])?>" style="width: 150px !important; height: 100px !important;" class="img-thumbnail"/>
+                                                    <img src="<?=base_url('/uploads/'. $info['img'])?>" style="width: 150px !important; height: 100px !important; margin: auto;" class="img-thumbnail"/>
                                                 <?php else: ?>
-                                                    <img src="<?=base_url('assets/images/default-img.png')?>" style="width: 150px !important; height: 100px !important;" class="img-thumbnail"/>
+                                                    <img src="<?=base_url('assets/images/default-img.png')?>" style="width: 150px !important; height: 100px !important; margin: auto;" class="img-thumbnail"/>
                                                 <?php endif ?>
                                             </th>
                                         </tr>
@@ -54,11 +62,11 @@
                                         </tr>
                                         <tr>
                                             <th>Item Name</th>
-                                            <td><?=$info['name']?></td>
+                                            <td><a href="<?=base_url('items/view/'.$info['id'])?>"><?=$info['name']?></a></td>
                                         </tr>
                                         <tr>
                                             <th>Serial No. / Control No.</th>
-                                            <td><?=$info['serial']?></td>
+                                            <td><a href="<?=base_url('items/view/'.$info['id'])?>"><?=$info['serial']?></a></td>
                                         </tr>
                                         <tr>
                                             <th>Unit</th>

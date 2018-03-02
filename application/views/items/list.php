@@ -69,6 +69,7 @@
                                                 <th>Selling Price</th>
                                                 <th>Unit</th>
                                                 <th>Category</th>
+                                                <th width="5%">QTY</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -88,6 +89,23 @@
                                                 <td><a href="<?=base_url('items/view/'.$res['id'])?>"><?=$res['srp']?></a></td>
                                                 <td><a href="<?=base_url('items/view/'.$res['id'])?>"><?=$res['unit']?></a></td>
                                                 <td><a href="<?=base_url('items/view/'.$res['id'])?>"><?=$res['category']?></a></td>
+                                                <td>
+                                                  <a href="<?=base_url('items/view/'.$res['id'])?>">           
+                                                    <?php if ($res['critical_level']): ?>
+                                                        <?php if(!$res['qty']): ?>
+                                                            <span class="badge bg-danger">0</span>
+                                                            <span class="label bg-danger">Restock</span>
+                                                        <?php elseif ($res['critical_level'] >= $res['qty']): ?>
+                                                            <span class="badge bg-danger"><?=$res['qty']?></span>
+                                                            <span class="badge bg-danger">!</span>
+                                                        <?php elseif($res['critical_level'] <= ($res['qty']*1.2)): ?>  
+                                                            <span class="badge bg-warning"><?=$res['qty']?></span>                                                        
+                                                        <?php endif ?>
+                                                    <?php else: ?>
+                                                        <span class="label label-success">Prepared Goods</span>                                    
+                                                    <?php endif ?>                                     
+                                                  </a>
+                                                </td>
                                             </tr>
                                         <?php endforeach ?>
                                         <?php endif ?>

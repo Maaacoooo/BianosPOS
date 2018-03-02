@@ -151,14 +151,16 @@ Class Item_Model extends CI_Model {
      * @param  int      $id         the Page ID of the request. 
      * @return Array        The array of returned rows 
      */
-    function fetch_items($limit, $id, $search, $is_deleted = 0) {
+    function fetch_items($limit, $id, $search, $is_deleted = 0, $is_merchandise = FALSE) {
           
           if($search) {
+            $this->db->group_start();
             $this->db->like('items.name', $search);
             $this->db->or_like('items.category', $search);
             $this->db->or_like('items.description', $search);
             $this->db->or_like('items.serial', $search);
             $this->db->or_like('items.id', $search);
+            $this->db->group_end();   
           }
 
             $this->db->join('item_inventory', 'item_inventory.item_id = items.id', 'left');
@@ -178,7 +180,7 @@ Class Item_Model extends CI_Model {
             SUM(item_inventory.qty) as qty
             ');
             
-            $this->db->where('items.is_deleted', $is_deleted);
+            //$this->db->where('items.is_deleted', $is_deleted);
             
             if (!is_null($limit)) {
               if (!is_null($id)) {
@@ -186,6 +188,13 @@ Class Item_Model extends CI_Model {
               } else {
                 $this->db->limit($limit);
               }
+            }
+
+
+
+            if ($is_merchandise) {              
+              $this->db->where('items.critical_level !=', 0);  
+                  
             }
 
             $query = $this->db->get("items");
@@ -254,7 +263,8 @@ Class Item_Model extends CI_Model {
                 item_inventory.batch_id,
                 item_inventory.srp,
                 item_inventory.dp,
-                item_inventory.qty
+                item_inventory.qty,
+                item_inventory.item_id
             ');            
 
             $this->db->where('item_id', $id);

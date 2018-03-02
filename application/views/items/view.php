@@ -27,6 +27,12 @@
                             <h3 class="page-title"><?=$info['name']?> </h3>
                         </div>
                     </div>
+
+                    <ol class="breadcrumb">
+                        <li><a href="<?=base_url('items')?>">Items</a></li>
+                        <li class="active"><?=$title?></li>
+                    </ol><!-- /.breadcrumb -->
+
                     <div class="row">
                         <div class="col-lg-12">
                           <?php
@@ -37,8 +43,7 @@
                           ?>
                           <?=$this->sessnotif->showNotif()?>
                         </div><!-- /.col-xs-12 -->
-                      </div><!-- /.row -->
-
+                      </div><!-- /.row -->                   
 
                     <div class="row">
                         <div class="col-sm-4">
@@ -80,7 +85,13 @@
                                         </tr>
                                         <tr>
                                             <th>Critical Level</th>
-                                            <td><?=$info['critical_level']?></td>
+                                            <td>
+                                                <?php if ($info['critical_level']): ?>
+                                                    <?=$info['critical_level']?>
+                                                <?php else: ?>
+                                                    <span class="label label-success">Prepared Goods</span>
+                                                <?php endif ?>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <th colspan="2">Description</th>
@@ -89,12 +100,6 @@
                                             <td colspan="2"><?=$info['description']?></td>
                                         </tr>
                                     </table>
-
-                                    <div class="footer">
-                                        <!--<div class="form-group">
-                                            <button type="button" class="btn btn-primary form-control" data-target="#rebatchModal" data-toggle="modal"><i class="fa fa-print"></i> Print Report</button>
-                                        </div>-->
-                                    </div>
 
                                 </div>
                                 <!-- /.card-block -->
@@ -110,11 +115,14 @@
                                 <div class="card-block">
                                     <!-- Nav tabs -->
                                     <ul class="nav nav-tabs" role="tablist">
+
+                                        <?php if ($info['critical_level']): ?>
                                         <li class="nav-item">
                                             <a class="nav-link <?php if(!($flash_error || $flash_success || $flash_valid))echo'active'?>" data-toggle="tab" href="#home" role="tab">Inventory</a>
-                                        </li>
+                                        </li>   
+                                        <?php endif ?>
                                         <li class="nav-item">
-                                            <a class="nav-link" data-toggle="tab" href="#profile" role="tab">Activity Logs</a>
+                                            <a class="nav-link <?php if(!$info['critical_level'])echo 'active'?>" data-toggle="tab" href="#logs" role="tab">Activity Logs</a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link <?php if($flash_error || $flash_success || $flash_valid)echo'active'?>" data-toggle="tab" href="#settings" role="tab">Settings</a>
@@ -123,6 +131,7 @@
 
                                     <!-- Tab panes -->
                                     <div class="tab-content">
+                                        <?php if ($info['critical_level']): ?>
                                         <div class="tab-pane <?php if(!($flash_error || $flash_success || $flash_valid))echo'active'?>" id="home" role="tabpanel">
                                             <?php if ($inventory): ?>
                                             <table class="table table-striped table-bordered">
@@ -138,10 +147,10 @@
                                                 
                                                 <?php foreach ($inventory as $inv): ?>
                                                     <tr>
-                                                        <td><?=$inv['batch_id']?></td>
-                                                        <td><?=$inv['dp']?></td>
-                                                        <td><?=$inv['srp']?></td>
-                                                        <td><?=$inv['qty']?></td>
+                                                        <td><a href="<?=base_url('items/view/'.$inv['item_id'].'/batch/'.$inv['batch_id'])?>"><?=$inv['batch_id']?></a></td>
+                                                        <td><a href="<?=base_url('items/view/'.$inv['item_id'].'/batch/'.$inv['batch_id'])?>"><?=$inv['dp']?></a></td>
+                                                        <td><a href="<?=base_url('items/view/'.$inv['item_id'].'/batch/'.$inv['batch_id'])?>"><?=$inv['srp']?></a></td>
+                                                        <td><a href="<?=base_url('items/view/'.$inv['item_id'].'/batch/'.$inv['batch_id'])?>"><?=$inv['qty']?></a></td>
                                                     </tr>
                                                 <?php endforeach ?>
                                                 </tbody>
@@ -156,7 +165,8 @@
                                             <?php endif ?>
 
                                         </div>
-                                        <div class="tab-pane" id="profile" role="tabpanel">
+                                        <?php endif ?>
+                                        <div class="tab-pane <?php if(!$info['critical_level'])echo 'active'?>" id="logs" role="tabpanel">
                                             <h5 class="title">Last 50 Activity</h5>
                                             <?php if ($logs): ?>
                                             <table class="table table-striped table-bordered">

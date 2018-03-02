@@ -48,13 +48,13 @@
                                         <div class="col-sm-8">
                                             <div class="form-group">
                                                 <label for="serial">Serial No. Control No.</label>
-                                                <input type="text" name="serial" class="form-control" id="serial" value="<?=set_value('serial')?>" placeholder="Serial No." required>
+                                                <input type="text" name="serial" class="form-control" id="serial" value="<?=set_value('serial')?>" placeholder="Serial No.">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
                                                 <label for="crit_level">Critical Level</label>
-                                                <input type="number" name="critical_level" class="form-control" id="crit_level" value="<?=set_value('critical_level')?>" placeholder="Critical Qty..." required>
+                                                <input type="number" name="critical_level" class="form-control" id="crit_level" value="<?=set_value('critical_level')?>" placeholder="Critical Qty...">
                                             </div>
                                         </div>
                                     </div>
@@ -62,7 +62,7 @@
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label for="dp">Dealers Price</label>
-                                                <input type="number" name="dp" class="form-control" id="dp" value="<?=set_value('dp')?>" placeholder="Dealers Price..." required/>
+                                                <input type="number" name="dp" class="form-control" id="dp" value="<?=set_value('dp')?>" placeholder="Dealers Price..."/>
                                             </div>
                                         </div>
                                         <!-- /.col-sm-6 -->
@@ -115,11 +115,7 @@
 
                                     <div class="footer">
                                         <div class="form-group pull-right">
-                                        <label for="check">
-                                            <input type="checkbox" name="check" id="check">
-                                            <strong>Consumable</strong>
-                                        </label>
-                                            <button type="submit" class="btn btn-primary">Register New Item</button>
+                                                <button type="submit" class="btn btn-primary">Register New Item</button>
                                         </div>
                                     </div>
 

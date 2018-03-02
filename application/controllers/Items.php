@@ -179,7 +179,14 @@ class Items extends CI_Controller {
 						$data['batch']		= $this->inventory_model->view_item($batch_id, NULL);
 						$data['items'] =   $this->inventory_model->view_item_inventory($batch_id);	
 						$data['logs']		= $this->logs_model->fetch_logs('inventory', $batch_id, 50);
-						$this->load->view('items/batch_view', $data);
+
+						//override title
+						$data['title'] = 'Batch ' . $data['batch']['batch_id'] . ' - ' . $data['info']['name'];
+						if ($data['batch']) {
+							$this->load->view('items/batch_view', $data);
+						} else {
+							show_404();
+						}
 
 					} elseif(!$this->uri->segment(4)) {
 						//Item View
