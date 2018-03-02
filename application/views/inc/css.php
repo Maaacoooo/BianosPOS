@@ -3,7 +3,7 @@
 
   <link rel="stylesheet" href="<?=base_url('assets/css/core.css')?>">
   <link rel="stylesheet" href="<?=base_url('assets/css/components.css')?>">
-  <link rel="stylesheet" href="<?=base_url('assets/icons/fontawesome/styles.min.css')?>">
+  <link rel="stylesheet" href="<?=base_url('assets/icons/fontawesome/css/font-awesome.min.css')?>">
   <link rel="stylesheet" href="<?=base_url('lib/css/chartist.min.css')?>">
 
   <style>
