@@ -126,7 +126,7 @@
                                         <thead>
                                             <tr>
                                                 <th>Batch ID</th>
-                                                <th>Item ID</th>
+                                                <th>Item Name</th>
                                                 <th>Category</th>
                                                 <th>Unit</th>
                                                 <th>Dealers Price</th>
@@ -140,17 +140,21 @@
                                         <?php foreach ($items as $item): ?>
                                             <tr>
                                                 <td><a href="<?=base_url('items/view/'. $item['id'] .'/batch/' . $item['batch_id'])?>"><?=$item['batch_id']?></a></td>
-                                                <td><a href="<?=base_url('items/view/'. $item['id'] .'/batch/' . $item['batch_id'])?>"><?=$item['id']?></a></td>
+                                                <td><a href="<?=base_url('items/view/'. $item['id'] .'/batch/' . $item['batch_id'])?>"><?=$item['name']?></a></td>
                                                 <td><a href="<?=base_url('items/view/'. $item['id'] .'/batch/' . $item['batch_id'])?>"><?=$item['category']?></a></td>
                                                 <td><a href="<?=base_url('items/view/'. $item['id'] .'/batch/' . $item['batch_id'])?>"><?=$item['unit']?></a></td>
                                                 <td><a href="<?=base_url('items/view/'. $item['id'] .'/batch/' . $item['batch_id'])?>"><?=$item['dp']?></a></td>
                                                 <td><a href="<?=base_url('items/view/'. $item['id'] .'/batch/' . $item['batch_id'])?>"><?=$item['srp']?></a></td>
                                                 <td>
-                                                <?php if ($item['critical_level'] >= $item['qty']): ?>
-                                                    <span class="badge badge-pill badge-danger"><?=$item['qty']?></span>
-                                                <?php else: ?>
-                                                    <?=$item['qty']?>
-                                                <?php endif ?>
+                                                <?php if(!$item['qty']): ?>
+                                                            <span class="badge bg-danger">0</span>
+                                                            <span class="label bg-danger">Restock</span>
+                                                        <?php elseif ($item['critical_level'] >= $item['qty']): ?>
+                                                            <span class="badge bg-danger"><?=$item['qty']?></span>
+                                                            <span class="badge bg-danger">!</span>
+                                                        <?php elseif($item['critical_level'] <= ($item['qty']*1.2)): ?>  
+                                                            <span class="badge bg-warning"><?=$item['qty']?></span>                                                        
+                                                        <?php endif ?>
                                                 </td>
                                             </tr>
                                         <?php endforeach ?>                                       
