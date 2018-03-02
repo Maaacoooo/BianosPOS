@@ -18,6 +18,8 @@
             // Set Change
             document.getElementById("change").innerHTML = tendered - total_amt;
         }
+
+
     </script>
 </head>
 
@@ -38,22 +40,51 @@
                             <h3 class="page-title">Sales Register</h3>
                         </div>
                     </div>
+
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="card">
+                                <div class="card-block">
+                                <h5 class="text-bold card-title">Pending Sales</h5>
+                                    <div class="row">
+                                        <?php for ($i=1; $i <= 6; $i++): ?>
+                                        <div class="col-sm-2">
+                                            <div class="widget-overview bg-success-1">
+                                                <div class="inner">
+                                                    <h2><?=$i?></h2>
+                                                    <p><?=decimalize($i*rand(5,10))?></p>
+                                                </div>
+
+                                                <div class="icon">
+                                                    <i class="fa fa-shopping-cart"></i>
+                                                </div>
+
+                                                <div class="details bg-success-3">
+                                                    <span><a href="http://localhost/bianos2/users" style="color: #fff;">View Details <i class="fa fa-arrow-right"></i></a></span>
+                                                </div>
+                                            </div>
+                                        </div><!-- /.col-sm-3 -->
+                                    <?php endfor; ?>
+                                    </div><!-- /.row -->
+                                </div><!-- /.card-block -->
+                            </div><!-- /.card -->
+                        </div><!-- /.col-lg-12 -->
+                    </div><!-- /.row -->
                     <div class="row">
                         <div class="col-lg-12">
                           <?=$this->sessnotif->showNotif()?>
                         </div><!-- /.col-xs-12 -->
-                      </div><!-- /.row -->
-
-
-                    <div class="row">
+                      </div><!-- /.row -->                   
+                    
+                    <div class="row" id="sales_register">
                         <div class="col-sm-8">
                             <div class="card">
                                 <div class="card-block">
-                                    <h5 class="text-bold card-title">Items</h5>
+                                    <h5 class="text-bold card-title">Add Item</h5>
                                     <div class="form-group">
                                     <?=form_open('sales/add_item')?>
                                         <div class="input-group">
-                                            <input type="text" name="item" class="form-control" id="search_item" placeholder="Type to Search Item..."/>
+                                            <input type="text" name="item" class="form-control" id="search_item" placeholder="Type to Search Item..." autofocus />
                                             <input type="hidden" name="sale_id" value="<?=$this->encryption->encrypt(0)?>" />
                                             <div class="input-group-btn">
                                                 <button type="submit" class="btn btn-default"><i class="fa fa-shopping-cart"></i> Add Item</button>
@@ -67,35 +98,36 @@
                                     <table class="table table-condensed table-striped">
                                         <thead>
                                             <tr>
-                                                <th>Batch ID</th>
-                                                <th>Item ID</th>
+                                                <th>Code</th>
                                                 <th>Item Name</th>
                                                 <th>Selling Price</th>
                                                 <th>QTY</th>
-                                                <th>DISC</th>
                                                 <th>Sub Total</th>
                                             </tr>
                                         </thead>
                                         <?php $sub[] = 0; if ($items): ?>
                                         <tbody>
-                                        <?php foreach ($items as $t): $qty[]=$t['qty']; $sub[]=(($t['qty']*$t['srp']) - ($t['qty'] * $t['discount'])); $disc[] = ($t['qty'] * $t['discount']); ?>
+                                        <?php foreach ($items as $t): $qty[]=$t['qty']; $sub[]=(($t['qty']*$t['srp'])); ?>
                                             <tr>
-                                                <td><?=$t['batch_id']?></td>
-                                                <td><?=$t['item_id']?></td>
+                                                <td>
+                                                    <?php if ($t['batch_id']): ?>
+                                                        <?=$t['batch_id']?>
+                                                    <?php else: ?>
+                                                        <?=$t['item_id']?>
+                                                    <?php endif ?>
+                                                </td>
                                                 <td><?=$t['name']?> - <?=$t['unit']?></td>
                                                 <td><?=$t['srp']?></td>
                                                 <td><input type="number" name="qty[]" value="<?=$t['qty']?>" style="width: 60px"/></td>
-                                                <td><input type="text" name="disc[]" value="<?=$t['discount']?>" style="width: 60px"/></td>
-                                                <td><?=(($t['qty']*$t['srp']) - ($t['qty'] * $t['discount']))?></td>
+                                                <td><?=(($t['qty']*$t['srp']))?></td>
                                             </tr>
-                                                <input type="hidden" name="id[]" value="<?=$this->encryption->encrypt($t['batch_id'])?>" />
+                                                <input type="hidden" name="id[]" value="<?=$this->encryption->encrypt($t['id'])?>" />
                                         <?php endforeach ?>
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <th colspan="4" class="text-right">Total</th>
+                                                <th colspan="3" class="text-right">Total</th>
                                                 <th class="table-success text-danger"><?=array_sum($qty)?></th><!-- /.bg-success text-danger -->
-                                                <th class="table-success text-danger"><?=decimalize(array_sum($disc))?></th><!-- /.bg-success text-danger -->
                                                 <th class="table-success text-danger"><?=decimalize(array_sum($sub))?></th><!-- /.bg-success text-danger -->
                                             </tr>
                                           </tfoot>
@@ -119,7 +151,7 @@
                             <!-- /.card -->
                         </div>
 
-                        <div class="col-sm-4">
+                        <div class="col-sm-4">                            
                             <div class="card">
                                 <div class="card-block">
                                 <?=form_open('sales/create')?>
@@ -153,11 +185,14 @@
                                 <div class="form-group">
                                     <button type="submit" class="btn btn-success form-control"><i class="fa fa-money"></i> Submit Sale</button> 
                                 </div>
+
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-warning btn-block"><i class="fa fa-cube"></i> SUSPEND SALE</button>
+                                </div><!-- /.form-group -->
                                 <?=form_close()?>
                                 </div>
-                            </div>
+                            </div> <!-- /.card -->
                         </div>
-
                     </div>                    
 
                 </div>
@@ -173,13 +208,20 @@
     <script type="text/javascript" src="<?=base_url('assets/custom/js/jquery-1.11.2.min.js')?>"></script> 
     <script src="<?=base_url('assets/custom/js/jquery-ui.js');?>" type="text/javascript" language="javascript" charset="UTF-8"></script>    
 
-
+    
 
     <script type="text/javascript">
           $(function(){
           $("#search_item").autocomplete({    
             source: "<?php echo base_url('index.php/sales/autocomplete_items');?>"
           });
+        });
+
+        $(document).ready(function() {
+            var height = ($(document).height());
+            window.scrollBy(0, height);
+
+            console.log(height);
         });
     </script>  
 

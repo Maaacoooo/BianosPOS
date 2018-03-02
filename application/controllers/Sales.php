@@ -378,17 +378,20 @@ class Sales extends CI_Controller {
 
 			} else {
 				$sales_id = $this->encryption->decrypt($this->input->post('sale_id'));
-				$item = $this->inventory_model->view_item($this->input->post('item')); //get the inventort details
+
+				$item = $this->input->post('item');
+				$sale_item = $this->sales_model->check_sales_item_queue($item, $sales_id);
 
 				//checks if it is in the actual cart
-				if($this->sales_model->view_item($item['batch_id'], $sales_id, $user['username'])) {
+				if($sale_item) {
 
-					$qty  = $this->sales_model->view_item($item['batch_id'], $sales_id, $user['username']); //gets the value of the existing quantity
-					$action = $this->sales_model->update_item_qty($item['batch_id'], $qty['qty'] + 1, $qty['discount'], $sales_id, $user['username']); // existing qty + 1; update quantity
+					$qty  = $this->sales_model->view_item($sale_item['id'], $sales_id); //gets the value of the existing quantity
+					$action = $this->sales_model->update_item_qty($sale_item['id'], $qty['qty'] + 1, $sales_id); // existing qty + 1; update quantity
 
 				} else {
 					//add to cart
-					$action = $this->sales_model->add_item($item['batch_id'], 1, $sales_id, $user['username']); //ID of the row	
+					$items = $this->sales_model->check_sale_item($item); //get item data					
+					$action = $this->sales_model->add_item($items['batch_id'], $items['item_id'], 1, $items['srp'], $sales_id); //ID of the row	
 				}
 							
 
@@ -409,17 +412,15 @@ class Sales extends CI_Controller {
 
 
 	/**
-	 * Checks if ITEM Exist in the Storage Inventory
+	 * Checks if ITEM Exist in the Storage Inventory / Item List
 	 * @param  [type] $item [description]
 	 * @return [type]       [description]
 	 */
-	function check_item($batch) {
+	function check_item($item) {
 
-		$id = $this->encryption->decrypt($this->input->post('id'));
+		$id = $this->encryption->decrypt($this->input->post('id')); //sale_id
 
-		$item = $this->inventory_model->view_item($batch);
-
-		if($item['qty'] > 0) {
+		if($this->sales_model->check_sale_item($item)) {
 			return TRUE;
 		} else {
 			$this->session->set_flashdata('error', 'No Item Record Found!');		
@@ -441,8 +442,11 @@ class Sales extends CI_Controller {
 		 
 		   if($this->form_validation->run() == FALSE)	{
 
-				$this->session->set_flashdata('error', 'An Error has Occured!');
-				redirect($_SERVER['HTTP_REFERER'], 'refresh');
+			  //convert validation errors to flashdata notification
+	          $notif['warning'] = array_values($this->form_validation->error_array());
+	          $this->sessnotif->setNotif($notif);
+
+	          redirect($_SERVER['HTTP_REFERER'], 'refresh');
 
 			} else {
 
@@ -451,9 +455,8 @@ class Sales extends CI_Controller {
 				foreach ($this->input->post('id') as $key => $item) {
 		                      
 		            $qty   = $this->input->post('qty')[$key];        
-		            $disc   = $this->input->post('disc')[$key];        
 
-		           	$this->sales_model->update_item_qty($this->encryption->decrypt($item), $qty, $disc, $sale_id, $userdata['username']);
+		           	$this->sales_model->update_item_qty($this->encryption->decrypt($item), $qty, $sale_id);
              
 		        }		
 		        
@@ -480,17 +483,25 @@ class Sales extends CI_Controller {
 		$userdata = $this->session->userdata('admin_logged_in'); //it's pretty clear it's a userdata
 		$user = $this->user_model->userdetails($userdata['username']); //fetches users record
 
-		foreach ($this->input->post('qty') as $key => $qty) {
-			// POST DATA 
-			$batch_id = $this->encryption->decrypt($this->input->post('id')[$key]);
-			//Inventory Data
-			$inv_qty = $this->inventory_model->view_item($batch_id, $user['location']); //fetches qty
+		$sale_id = $this->encryption->decrypt($this->input->post('sale_id'));
 
-			if($this->input->post('qty')[$key] > $inv_qty['qty']) {
-				//returns false on Error
-				$this->session->set_flashdata('warning', 'Check Quantity of <span class="badge badge-flat badge-primary">' . $inv_qty['batch_id'] . '</span> Current Items in Stock: <span class="badge badge-flat badge-danger">'. $inv_qty['qty'] . '</span>');
-				return FALSE;
-			} 
+		foreach ($this->input->post('qty') as $key => $qty) {
+
+			$row_id = $this->encryption->decrypt($this->input->post('id')[$key]); //row
+
+			$sale_item = $this->sales_model->view_item($row_id, $sale_id);
+
+			//check if it's Served Goods 
+			if ($sale_item['batch_id']) {
+				//Merchandise Items
+				$inv_qty = $this->inventory_model->view_item($sale_item['batch_id']); //fetches qty
+
+				if($this->input->post('qty')[$key] > $inv_qty['qty']) {
+					//returns false on Error
+					$this->form_validation->set_message('check_quantity', 'Check Quantity of <span class="badge badge-flat badge-primary">' . $inv_qty['batch_id'] . '</span> Current Items in Stock: <span class="badge badge-flat badge-danger">'. $inv_qty['qty'] . '</span>');
+					return FALSE;
+				} 
+			}
 		}
 
 		return TRUE;
@@ -508,11 +519,17 @@ class Sales extends CI_Controller {
 
 			if (isset($_GET['term'])){
 		      $q = strtolower($_GET['term']);
-		      $result = $this->move_model->autocomplete_items($q);
+		      $result = $this->sales_model->autocomplete_items($q);
 
-		      foreach($result as $row) {
-		      	$new_row['label']=htmlentities(stripslashes($row['batch_id'] . ' - ' . $row['name'] . ' (In Stock: ' . $row['qty']. ' ' . $row['unit']).' | DP:'. $row['dp'] . ' | SRP:' . $row['srp'] .')');
-	            $new_row['value']=htmlentities(stripslashes($row['batch_id']));
+		     foreach($result as $row) {
+		      	if ($row['batch_id']) {
+		      		$new_row['label']=htmlentities(stripslashes($row['batch_id'] . ' - ' . $row['name'] . ' (In Stock: ' . $row['qty']. ' ' . $row['unit']). ' | SRP:' . $row['srp'] .')');
+	            	$new_row['value']=htmlentities(stripslashes($row['batch_id']));
+		      	} else {
+		      		$new_row['label']=htmlentities(stripslashes($row['id'] . ' - ' . $row['name'] . ' (In Stock: ' . $row['qty']. ' ' . $row['unit']). ' | SRP:' . $row['srp'] .')');
+	            	$new_row['value']=htmlentities(stripslashes($row['id']));
+		      	}
+
 	            $row_set[] = $new_row; //build an array
 	          }
 	          echo json_encode($row_set); //format the array into json data     

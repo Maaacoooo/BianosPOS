@@ -87,7 +87,7 @@ Class Sales_Model extends CI_Model {
 
 
     //function fetch_sales($limit, $id, $search, $date, $status) {
-    function fetch_sales($limit, $id, $search, $date) {
+    function fetch_sales($limit, $id, $search, $date, $status = 1) {
 
             if($search) {
               $this->db->like('sales.customer', $search);
@@ -143,7 +143,7 @@ Class Sales_Model extends CI_Model {
      * @return int       the total rows
      */
     //function count_sales($search, $date, $status) {
-    function count_sales($search, $date) {
+    function count_sales($search, $date, $status = 1) {
 
         if($search) {
               $this->db->like('sales.customer', $search);
@@ -183,56 +183,48 @@ Class Sales_Model extends CI_Model {
      * @param [type] $qty       [description]
      * @param [type] $export_id [description]
      */
-    function add_item($item, $qty, $sale_id, $user) {
+    function add_item($batch, $item, $qty, $srp, $sale_id) {
 
             $data = array(              
-                'batch_id'    => $item,  
+                'batch_id'    => $batch,  
+                'item_id'     => $item,  
                 'sale_id'     => $sale_id,  
-                'qty'         => $qty,                 
-                'user'        => $user         
+                'qty'         => $qty,      
+                'srp'         => $srp      
              );
        
             return $this->db->insert('sale_items', $data);    
 
     }
 
-    function update_item_qty($item, $qty, $discount, $sale_id, $user) {
+    function update_item_qty($id, $qty, $sale_id) {
 
             //if $qty > 0 - update row 
             if($qty) {
               
               $data = array(              
-                'qty'         => $qty,                    
-                'discount'    => $discount                    
+                'qty'         => $qty              
              );
-              
-              if (!is_null($user)) {
-                $this->db->where('sale_items.user', $user);
-              }
-              $this->db->where('batch_id', $item);
-              $this->db->where('sale_id', $sale_id);
+              $this->db->where('id', $id);
+
               return $this->db->update('sale_items', $data); 
 
             } else {
             
-              if (!is_null($user)) {
-                $this->db->where('sale_items.user', $user);
-              }
-              $this->db->where('batch_id', $item);
-              $this->db->where('sale_id', $sale_id);
+              $this->db->where('id', $id);
+
               return $this->db->delete('sale_items'); 
 
             }     
 
     }
 
-     function view_item($item, $sale_id, $user) {
+
+
+     function view_item($row, $sale_id) {
 
             $this->db->select('*');        
-            if (!is_null($user)) {
-                $this->db->where('sale_items.user', $user);
-            }
-            $this->db->where('batch_id', $item);
+            $this->db->where('id', $row);
             $this->db->where('sale_id', $sale_id);        
             $this->db->limit(1);
 
@@ -241,28 +233,72 @@ Class Sales_Model extends CI_Model {
             return $query->row_array();
     }
 
+    /**
+     * Checks if an item exist in the actual sale queue
+     * @param  String  $item    Item ID / Batch ID
+     * @param  int     $sale_id [description]
+     * @return [type]           [description]
+     */
+    function check_sales_item_queue($item, $sale_id) {
+          $this->db->where('sale_id', $sale_id);
+          $this->db->group_start();
+            $this->db->where('batch_id', $item);
+            $this->db->or_where('item_id', $item);
+          $this->db->group_end();
+          $query = $this->db->get('sale_items');
 
-    function fetch_sale_items($sale_id, $user) {
+          return $query->row_array();
+    }
 
-            $this->db->join('item_inventory', 'item_inventory.batch_id = sale_items.batch_id', 'left');
-            $this->db->join('items', 'items.id = item_inventory.item_id', 'left');
+
+    /**
+     * Checks sale item is available in the inventory / item list
+     * @param  [type] $item [description]
+     * @return [type]       [description]
+     */
+    function check_sale_item($item) {
+
+        $this->db->where('batch_id', $item);
+        $this->db->where('qty >', 0);
+        $query = $this->db->get('item_inventory');
+
+        if ($query->num_rows() > 0) {
+          return $query->row_array();
+        }
+
+        ///// Check Item 
+        $this->db->where('id', $item);
+        $this->db->where('critical_level', 0);
+        $query = $this->db->get('items');
+
+        if ($query->num_rows() > 0) {
+          $data = $query->row_array();
+          $data['item_id'] = $data['id'];
+          $data['batch_id'] = NULL;
+
+          return $data;
+        }
+
+        return FALSE;
+
+    }
+
+
+    function fetch_sale_items($sale_id) {
+
+            $this->db->join('items', 'items.id = sale_items.item_id', 'left');
             $this->db->select('
             sale_items.id,            
-            sale_items.discount,
             sale_items.qty,
             sale_items.batch_id,
+            sale_items.srp,
             items.id as item_id,
             items.name,
             items.category,
             items.serial,
             items.unit,
-            item_inventory.srp,
-            item_inventory.dp,
             ');          
             
-            if (!is_null($user)) {
-                $this->db->where('sale_items.user', $user);
-            }
             $this->db->where('sale_items.sale_id', $sale_id); 
 
             $query = $this->db->get("sale_items");
@@ -272,6 +308,37 @@ Class Sales_Model extends CI_Model {
             }
             return false;
 
+    }
+
+
+
+    function autocomplete_items($q) {
+
+            $this->db->group_start();
+            $this->db->like('items.name', $q);
+            $this->db->or_like('items.description', $q);
+            $this->db->or_like('items.serial', $q);
+            $this->db->or_like('items.id', $q);
+            $this->db->or_like('item_inventory.batch_id', $q);
+            $this->db->group_end();
+
+            $this->db->select('
+            items.id,
+            items.name,
+            items.unit,
+            item_inventory.batch_id,
+            item_inventory.qty,
+            item_inventory.dp,
+            item_inventory.srp
+            ');
+
+            $this->db->join('item_inventory', 'item_inventory.item_id = items.id', 'left');
+            $this->db->where('item_inventory.qty >', 0);           
+            $this->db->or_where('itemS.critical_level', 0);           
+            $this->db->limit(15);
+            $query = $this->db->get('items');
+            
+            return $query->result_array();
     }
 
 
