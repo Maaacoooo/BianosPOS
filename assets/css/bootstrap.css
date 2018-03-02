@@ -2317,8 +2317,8 @@ tbody.collapse.show {
   vertical-align: middle; }
 
 .input-group-addon {
-  padding: 0.5rem 0.75rem;
-  margin-bottom: 0;
+  padding: 10px; 
+  margin: 2px 0px;
   font-size: 0.875rem;
   font-weight: normal;
   line-height: 1.25;
