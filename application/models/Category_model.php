@@ -108,7 +108,7 @@ Class Category_Model extends CI_Model {
      */
     function fetch_inventory($limit, $id, $category) {
 
-            $this->db->join('items', 'items.id = item_inventory.item_id', 'left');
+            $this->db->join('item_inventory', 'item_inventory.item_id = items.id', 'left');
             $this->db->group_by('item_inventory.item_id');
             $this->db->select('
                 items.id,
@@ -123,7 +123,7 @@ Class Category_Model extends CI_Model {
             $this->db->limit($limit, (($id-1)*$limit));            
             $this->db->where('items.category', $category);
 
-            $query = $this->db->get("item_inventory");
+            $query = $this->db->get("items");
 
             if ($query->num_rows() > 0) {
                 return $query->result_array();
