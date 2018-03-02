@@ -261,11 +261,7 @@ class Items extends CI_Controller {
 			$this->form_validation->set_rules('desc', 'Description', 'trim'); 
 			$this->form_validation->set_rules('srp', 'Selling Price', 'trim|decimal'); 
 			$this->form_validation->set_rules('dp', 'Dealers Price', 'trim|decimal|callback_validate'); 
-
-			if($data['user']['usertype'] == 'Administrator') {
-								
-			}
-			
+		
 
 			if($this->form_validation->run() == FALSE)	{
 					$this->load->view('items/create', $data);
@@ -679,11 +675,11 @@ class Items extends CI_Controller {
 
 			if (isset($_GET['term'])){
 		      $q = strtolower($_GET['term']);
-		      $result = $this->item_model->fetch_items(10, NULL, $q);
+		      $result = $this->item_model->fetch_items(10, NULL, $q, 0, TRUE);
 
 		      foreach($result as $row) {
 		      	if ($row['is_deleted'] == 0) {
-		      	$new_row['label']=htmlentities(stripslashes($row['id'] . ' - ' . $row['name'] . ' - ' . $row['dp'] . ' - ' . $row['srp']));
+		      	$new_row['label']=htmlentities(stripslashes($row['id'] . ' - ' . $row['name']));
 	            $new_row['value']=htmlentities(stripslashes($row['id']));
 	            $row_set[] = $new_row; //build an array
 	          	}
