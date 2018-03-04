@@ -5,46 +5,67 @@ Class Sales_Model extends CI_Model {
 
     function create($user) {
 
+          $senior = 0;
+          $discount = 0;
+
+          //Appy Senior Citizen Discount
+          if ($this->input->post('senior')) {
+            $senior = $this->getSeniorDiscount(0)['srp'] * 0.2; //standard percentage (20%)
+          }
+          //Apply Discounts
+          if ($this->input->post('discount')) {
+            foreach($this->fetch_sale_items(0) as $item) {
+              $disc[] = $item['srp'] * $item['qty'];
+            }
+            $discount =  array_sum($disc) * 0.1; //standard percentage (10%)
+          }
+
             $data = array(              
                 'customer'        => $this->input->post('customer'),              
                 'remarks'         => $this->input->post('remarks'),                
                 'amount_tendered' => $this->input->post('amt_tendered'),                
-                'user'            => $user,
-                'status'          => 1             
+                'status'          => 0,             
+                'senior'          => $senior,             
+                'discount'        => $discount,             
+                'user'            => $user             
              );
        
            $this->db->insert('sales', $data);    
 
            $sale_id = $this->db->insert_id();
-
-           $items = $this->fetch_sale_items(0, $user);
-
-           if($items) {
-            //Update current sale items
-              $data = array(              
-                'sale_id'    => $sale_id                    
-             );            
-              $this->db->where('user', $user);
-              $this->db->where('sale_id', 0);
-              $this->db->update('sale_items', $data); 
-
-           } else {
-              return false;
-           }
-
+           //Update Sales ID
+           $this->db->where('sale_id', 0);
+           $this->db->update('sale_items', array('sale_id' => $sale_id)); 
 
            return $sale_id;
     }
 
 
 
-    function update($id) {
+    function update($id, $user) {
+      
+          $senior = 0;
+          $discount = 0;
+
+        //Appy Senior Citizen Discount
+          if ($this->input->post('senior')) {
+            $senior = $this->getSeniorDiscount($id)['srp'] * 0.2; //standard percentage (20%)
+          }
+          //Apply Discounts
+          if ($this->input->post('discount')) {
+            foreach($this->fetch_sale_items($id) as $item) {
+              $disc[] = $item['srp'] * $item['qty'];
+            }
+            $discount =  array_sum($disc) * 0.1; //standard percentage (10%)
+          }
 
             $data = array(              
                 'customer'        => $this->input->post('customer'),                              
                 'remarks'         => $this->input->post('remarks'),                
-                'amount_tendered' => $this->input->post('amt_tendered'),                
-       
+                'amount_tendered' => $this->input->post('amt_tendered'),    
+                'senior'          => $senior,             
+                'discount'        => $discount,               
+                'user'            => $user  
              );
 
            $this->db->where('id', $id);
@@ -52,7 +73,7 @@ Class Sales_Model extends CI_Model {
     }
 
 
-    function verify($id, $status) {
+    function change_status($id, $status) {
 
             $data = array(              
                 'status' => $status               
@@ -64,20 +85,34 @@ Class Sales_Model extends CI_Model {
     }
 
 
+    function cancel_sale() {
+
+           $id = $this->encryption->decrypt($this->input->post('id'));
+
+           $this->db->delete('sale_items', array('sale_id'=>$id));   
+           return $this->db->delete('sales', array('id'=>$id));    
+
+    }
+
+
 
 
 
     function view($id) {
-            $this->db->join('users', 'users.username = sales.user', 'left');        
+            $this->db->join('users', 'users.username = sales.user', 'left');      
+            $this->db->join('sale_items', 'sale_items.sale_id = sales.id', 'left');  
             $this->db->select('
                 sales.id,
+                sales.discount,
+                sales.senior,
                 sales.customer,
                 sales.remarks,
                 sales.status,
                 sales.created_at,
                 sales.updated_at,
                 sales.amount_tendered,
-                users.name as user
+                users.name as user,
+                SUM(sale_items.qty * sale_items.srp) as total
             ');
             $this->db->where('sales.id', $id);
             $query = $this->db->get('sales');
@@ -93,23 +128,26 @@ Class Sales_Model extends CI_Model {
               $this->db->like('sales.customer', $search);
             }
 
-            $this->db->join('users', 'users.username = sales.user', 'left');
-            $this->db->join('sale_items', 'sale_items.sale_id = sales.id', 'left');
-            $this->db->join('item_inventory', 'item_inventory.batch_id = sale_items.batch_id', 'left');
+            $this->db->join('users', 'users.username = sales.user', 'left');      
+            $this->db->join('sale_items', 'sale_items.sale_id = sales.id', 'left');  
             $this->db->select('
                 sales.id,
+                sales.discount,
+                sales.senior,
+                sales.customer,
+                sales.remarks,
                 sales.status,
                 sales.created_at,
                 sales.updated_at,
                 sales.amount_tendered,
-                sales.customer,
                 users.name as user,
-                SUM((item_inventory.srp * sale_items.qty) - (sale_items.discount * sale_items.qty)) as totalAmt                
+                SUM(sale_items.qty * sale_items.srp) as total,
+                (SUM(sale_items.qty * sale_items.srp) - sales.senior - sales.discount) as totalAmt,
             ');
 
-            /*if(!is_null($status)) {
-              $this->db->where('sales.status', $status);
-            }*/
+
+            $this->db->where('sales.status', $status);
+            
 
             if(($date)) {
                $arr_date = (explode("-",$date));
@@ -174,7 +212,7 @@ Class Sales_Model extends CI_Model {
 
 
 
-    // IMPORT ITEMS ////////////////////////////////////////////////////////////////////////////
+    // SALE ITEMS ////////////////////////////////////////////////////////////////////////////
 
 
     /**
@@ -339,6 +377,22 @@ Class Sales_Model extends CI_Model {
             $query = $this->db->get('items');
             
             return $query->result_array();
+    }
+
+
+    /**
+     * Returns the item with the largest SRP
+     * @param  [type] $sales_id [description]
+     * @return [type]           [description]
+     */
+    function getSeniorDiscount($sale_id) {
+
+          $this->db->where('sale_id', $sale_id);
+          $this->db->order_by('srp', 'DESC');
+          $query = $this->db->get('sale_items');
+
+          return $query->row_array();
+
     }
 
 

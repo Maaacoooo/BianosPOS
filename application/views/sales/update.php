@@ -37,42 +37,17 @@
                 <div class="content">
                     <div class="row">
                         <div class="col-md-12">
-                            <h3 class="page-title">Sales Register</h3>
+                            <h3 class="page-title"><?=$title?></h3>
                         </div>
                     </div>
-
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="card">
-                                <div class="card-block">
-                                <h5 class="text-bold card-title">Pending Sales</h5>
-                                    <div class="row">
-                                        <?php foreach ($pending as $pen): ?>
-                                        <div class="col-sm-2">
-                                            <div class="widget-overview bg-success-1">
-                                                <div class="inner">
-                                                    <h2>#<?=$pen['id']?></h2>
-                                                    <p><?=moneytize($pen['total'])?></p>
-                                                </div>
-
-                                                <div class="icon">
-                                                    <i class="fa fa-shopping-cart"></i>
-                                                </div>
-
-                                                <div class="details bg-success-3">
-                                                    <span><a href="<?=base_url('sales/update/'.$pen['id'])?>" style="color: #fff;">Continue <i class="fa fa-arrow-right"></i></a></span>
-                                                </div>
-                                            </div>
-                                        </div><!-- /.col-sm-3 -->
-                                    <?php endforeach; ?>
-                                    </div><!-- /.row -->
-                                </div><!-- /.card-block -->
-                            </div><!-- /.card -->
-                        </div><!-- /.col-lg-12 -->
-                    </div><!-- /.row -->
                     <div class="row">
                         <div class="col-lg-12">
                           <?=$this->sessnotif->showNotif()?>
+
+                          <div class="callout callout-warning">
+                              <h6 class="strong"><i class="fa fa-warning"></i> Pending Sale</h6><!-- /.strong -->
+                              <p>This  sale is marked pending.</p>
+                          </div><!-- /.callout callout-warning -->
                         </div><!-- /.col-xs-12 -->
                       </div><!-- /.row -->                   
                     
@@ -85,7 +60,7 @@
                                     <?=form_open('sales/add_item')?>
                                         <div class="input-group">
                                             <input type="text" name="item" class="form-control" id="search_item" placeholder="Type to Search Item..." autofocus />
-                                            <input type="hidden" name="sale_id" value="<?=$this->encryption->encrypt(0)?>" />
+                                            <input type="hidden" name="sale_id" value="<?=$this->encryption->encrypt($info['id'])?>" />
                                             <div class="input-group-btn">
                                                 <button type="submit" class="btn btn-default"><i class="fa fa-shopping-cart"></i> Add Item</button>
                                             </div>
@@ -94,7 +69,7 @@
                                     </div>
 
                                     <?=form_open('sales/update_items')?>
-                                    <input type="hidden" name="sale_id" value="<?=$this->encryption->encrypt(0)?>" />
+                                    <input type="hidden" name="sale_id" value="<?=$this->encryption->encrypt($info['id'])?>" />
                                     <table class="table table-condensed table-striped">
                                         <thead>
                                             <tr>
@@ -154,25 +129,25 @@
                         <div class="col-sm-4">                            
                             <div class="card">
                                 <div class="card-block">
-                                <?=form_open('sales/create')?>
+                                <?=form_open('sales/update/'.$info['id'])?>
                                 <h5 class="text-bold card-title">Sales Options</h5>
 
                                 <div class="form-group">
                                     <label for="customer">Customer</label>
-                                    <input type="text" name="customer" class="form-control" id="customer" placeholder="Customer..." value="Walk-in" required>
+                                    <input type="text" name="customer" class="form-control" id="customer" placeholder="Customer..." value="<?=$info['customer']?>" required>
                                 </div>      
 
                                 <div class="form-group">
                                     <label for="remarks">Remarks</label>
-                                    <textarea name="remarks" class="form-control" id="remarks" cols="30" rows="2"></textarea>
+                                    <textarea name="remarks" class="form-control" id="remarks" cols="30" rows="2"><?=$info['remarks']?></textarea>
                                 </div>
 
                                 <div class="form-group">
                                   <label>Senior Citizen</label>
                                   <div class="input-group">                                        
-                                    <input type="text" id="senior_field" class="form-control" value="0.00" readonly>
+                                    <input type="text" id="senior_field" class="form-control" value="<?=$info['senior']?>" readonly>
                                     <span class="input-group-addon">
-                                          <input type="checkbox" name="senior" id="senior">
+                                          <input type="checkbox" name="senior" id="senior" <?php if($info['senior']>0)echo'checked';?>>
                                     </span>
                                   </div>
                                 </div><!-- /.form-group -->
@@ -181,9 +156,9 @@
                                 <div class="form-group">
                                   <label>Loyalty Discount</label>
                                   <div class="input-group">                                        
-                                    <input type="text" id="loyalty_field" class="form-control" value="0.00" readonly>
+                                    <input type="text" id="loyalty_field" class="form-control" value="<?=$info['discount']?>" readonly>
                                     <span class="input-group-addon">
-                                          <input type="checkbox" name="discount" id="loyalty">
+                                          <input type="checkbox" name="discount" id="loyalty" <?php if($info['discount']>0)echo'checked';?>>
                                     </span>
                                   </div>
                                 </div><!-- /.form-group -->
@@ -209,8 +184,9 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <button type="button" class="btn btn-warning btn-block"><i class="fa fa-cube"></i> SUSPEND SALE</button>
+                                    <button type="button" data-target="#cancel" data-toggle="modal" class="btn btn-danger btn-block"><i class="fa fa-ban"></i> CANCEL SALE</button>
                                 </div><!-- /.form-group -->
+                                    <input type="hidden" name="id" value="<?=$this->encryption->encrypt($info['id'])?>" />
                                 <?=form_close()?>
                                 </div>
                             </div> <!-- /.card -->
@@ -220,6 +196,34 @@
                 </div>
             </div>
             <!-- /PAGE CONTENT -->
+
+            <!-- Modal -->  
+            <div class="modal fade" id="cancel">
+                    <div class="modal-dialog modal-sm">
+                       <?=form_open('sales/cancel')?>                                                            
+                      <div class="modal-content">
+                        <div class="modal-header">                        
+                        <h4 class="modal-title">Cancel Sale #<?=prettyID($info['id'])?></h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span></button>
+                        </div>
+                        <div class="modal-body">                          
+                            <p class="text-center">Are you sure to cancel this sale? <br/>You CANNOT UNDO this action</p>
+                        </div>
+                        <!-- /.modal-body -->
+                        <div class="modal-footer">
+                          <input type="hidden" name="id" value="<?=$this->encryption->encrypt($info['id'])?>" />
+
+                          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                          <button type="submit" class="btn btn-danger btn-flat"><i class="fa fa-ban"></i> Cancel Sale</button>
+                        </div>
+                      </div>
+                      <!-- /.modal-content -->
+                    </form>            
+                </div>
+                    <!-- /.modal-dialog -->
+            </div>
+            <!-- /.Modal -->
 
         </div>
     </div>
@@ -239,44 +243,28 @@
           });
         });
 
+        var total_amt = <?=array_sum($sub)?>; //the total of cart
+
         $(document).ready(function() {
+            
+            change_senior();
+            change_loyalty();
 
-            <?php if($sales_id): ?>  
-                window.open("<?=base_url('sales/view/'.$sales_id.'/print')?>", "_blank", "toolbar=no, location=yes, directories=no, status=no, menubar=no, scrollbars=yes, resizable=no, width=1000, height=400");            
-            <?php endif; ?>
-
-            var height = ($(document).height());
-            window.scrollBy(0, height);
-
-            var total_amt = <?=array_sum($sub)?>; //the total of cart
-
-            $('#loyalty').click(function() {
-
-                var amount;
-
-                if ($('#senior').prop('checked')) {
-                    amount = total_amt - getSenior();
-                } else {
-                    amount = total_amt;
-                }
-
-                if($(this).prop("checked")) {
-                    var discount = getLoyalty(total_amt);
-
-                    $('#loyalty_field').val(discount);
-                    $('#totAmt').text((amount - discount).toFixed(2));
-                    $('#amt_tendered').val((amount - discount).toFixed(2));
-
-                } else {
-                    $('#totAmt').text(amount.toFixed(2));
-                    $('#amt_tendered').val(amount.toFixed(2));
-                    $('#loyalty_field').val('0.00');
-                    
-                }
+            $('#loyalty').on('click', function() {
+                change_loyalty();
             });
 
-            $('#senior').click(function() {
-                var amount;
+            $('#senior').on('click', function() {
+                change_senior();                 
+            });
+
+
+
+        });
+
+
+        function change_senior() {
+            var amount;
 
                 if ($('#loyalty').prop('checked')) {
                     amount = total_amt - getLoyalty(total_amt);
@@ -284,22 +272,45 @@
                     amount = total_amt;
                 }
 
-                if($(this).prop("checked")) {
+                if($('#senior').prop("checked")) {
                     var senior_cit = getSenior();
 
                     $('#senior_field').val(senior_cit);
-                    $('#totAmt').text((amount - senior_cit).toFixed(2));
                     $('#amt_tendered').val((amount - senior_cit).toFixed(2));
+                    $('#totAmt').text((amount - senior_cit).toFixed(2));
 
                 } else {
+                    $('#amt_tendered').val((amount).toFixed(2));
                     $('#totAmt').text(amount.toFixed(2));
-                    $('#amt_tendered').val(amount.toFixed(2));
                     $('#senior_field').val('0.00');
                     
                 }
-                 
-            });
-        });
+
+        }
+
+        function change_loyalty() {
+              var amount;
+
+                if ($('#senior').prop('checked')) {
+                    amount = total_amt - getSenior();
+                } else {
+                    amount = total_amt;
+                }
+
+                if($('#loyalty').prop("checked")) {
+                    var discount = getLoyalty(total_amt);
+
+                    $('#loyalty_field').val(discount);
+                    $('#amt_tendered').val((amount - discount).toFixed(2));
+                    $('#totAmt').text((amount - discount).toFixed(2));
+
+                } else {
+                    $('#totAmt').text(amount.toFixed(2));
+                    $('#amt_tendered').val((amount).toFixed(2));
+                    $('#loyalty_field').val('0.00');
+                    
+                }
+        }
 
 
         function getSenior(amount) {
@@ -311,7 +322,7 @@
                         {
                             async: false,
                             type: "GET",
-                            url: "<?=base_url('sales/getSeniorDiscount')?>",
+                            url: "<?=base_url('sales/getSeniorDiscount/'.$info['id'])?>",
                             data: "{}",
                             contentType: "application/json; charset=utf-8",
                             dataType: "json",

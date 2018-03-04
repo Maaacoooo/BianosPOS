@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="<?=base_url('assets/css/bootstrap.css')?>">
     <link rel="stylesheet" href="<?=base_url('assets/css/core.css')?>">
     <link rel="stylesheet" href="<?=base_url('assets/css/components.css')?>">
-    <link rel="stylesheet" href="<?=base_url('assets/icons/fontawesome/styles.min.css')?>">
+    <link rel="stylesheet" href="<?=base_url('assets/icons/fontawesome/css/font-awesome.css')?>">
 
     <script type="text/javascript" src="<?=base_url('lib/js/jquery.min.js')?>"></script>
     <script type="text/javascript" src="<?=base_url('lib/js/tether.min.js')?>"></script>

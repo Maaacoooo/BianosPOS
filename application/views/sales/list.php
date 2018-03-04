@@ -89,7 +89,7 @@
                                                 <td><a href="<?=base_url('sales/view/'. $res['id'])?>">#<?=prettyID($res['id'])?></a></td>
                                                 <td><a href="<?=base_url('sales/view/'. $res['id'])?>"><?=$res['user']?></a></td>
                                                 <td><a href="<?=base_url('sales/view/'. $res['id'])?>"><?=$res['customer']?></a></td>
-                                                <td><a href="<?=base_url('sales/view/'. $res['id'])?>"><?=$res['totalAmt']?></a></td>
+                                                <td><a href="<?=base_url('sales/view/'. $res['id'])?>"><?=moneytize($res['totalAmt'])?></a></td>
                                                 <td><a href="<?=base_url('sales/view/'. $res['id'])?>"><?=$res['created_at']?></a></td>
                                             </tr>
                                         <?php endforeach ?>
