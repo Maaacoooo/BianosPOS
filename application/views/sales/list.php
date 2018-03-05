@@ -85,6 +85,7 @@
                                         <?php if ($results): ?>
                                         <tbody>
                                         <?php foreach ($results as $res): ?>
+                                            <?php $sum[] = $res['totalAmt']; ?>
                                             <tr>
                                                 <td><a href="<?=base_url('sales/view/'. $res['id'])?>">#<?=prettyID($res['id'])?></a></td>
                                                 <td><a href="<?=base_url('sales/view/'. $res['id'])?>"><?=$res['user']?></a></td>
@@ -96,6 +97,8 @@
                                         </tbody>
                                         <?php endif ?>
                                     </table>
+
+                                    <?=array_sum($sum)?>
 
                                     <div class="footer">
                                         <div class="form-group">

@@ -75,8 +75,16 @@ Class Sales_Model extends CI_Model {
 
     function change_status($id, $status) {
 
+        $amount = 0; 
+        if ($status == 1) {
+          $this->db->select('SUM(qty * srp) as total');
+          $this->db->where('sale_id', $id);
+          $amount = $this->db->get('sale_items')->row_array()['total'];
+        }
+
             $data = array(              
-                'status' => $status               
+                'status' => $status,
+                'amount' => $amount               
        
              );
 
@@ -392,6 +400,49 @@ Class Sales_Model extends CI_Model {
           $query = $this->db->get('sale_items');
 
           return $query->row_array();
+
+    }
+
+
+
+    /**
+     * Returns the top items sold
+     * @param  [type] $limit [description]
+     * @return [type]        [description]
+     */
+    function getTopItems($limit = NULL) {
+        $this->db->select('
+          SUM(sale_items.qty) as count,
+          items.name
+          ');
+
+        $this->db->join('items', 'items.id = sale_items.item_id', 'left');
+        $this->db->group_by('items.id');
+        $this->db->order_by('count', 'DESC');
+
+        $query = $this->db->get('sale_items');
+
+        return $query->result_array();
+
+    }
+
+
+    function getMonthlySales($limit = NULL) {
+
+            
+            $this->db->select('
+                DATE_FORMAT(created_at, "%Y-%m") as month,
+                MONTH(created_at) as m,
+                (SUM(sales.amount) - SUM(sales.discount) - SUM(sales.senior)) as total
+            ');
+
+            $this->db->group_by('MONTH(sales.created_at)');
+            $this->db->where('sales.status', 1);
+            $this->db->limit($limit);
+
+            $query = $this->db->get('sales');
+
+            return $query->result_array(); 
 
     }
 

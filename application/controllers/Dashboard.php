@@ -10,6 +10,7 @@ class Dashboard extends CI_Controller {
        $this->load->model('sales_model');
        $this->load->model('inventory_model');
        $this->load->model('import_model');
+       $this->load->model('item_model');
 	}	
 
 
@@ -28,11 +29,13 @@ class Dashboard extends CI_Controller {
 
 			if($data['user']['usertype'] == 'Administrator') {
 
-			$data['count_inventory'] = $this->inventory_model->count_items(NULL); 
+			$data['count_inventory'] = $this->item_model->count_items(NULL); 
 			$data['count_users'] = $this->user_model->count_users(NULL);
 			$data['count_sales'] = $this->sales_model->count_sales(NULL, NULL, NULL);
 			$data['count_imports'] = $this->import_model->count_imports(NULL);
 
+			$data['pending'] 	= $this->sales_model->fetch_sales(NULL, NULL, NULL, NULL, 0);
+			
 				$this->load->view('dashboard/dashboard_admin', $data);						
 
 			} else {
@@ -122,6 +125,18 @@ class Dashboard extends CI_Controller {
 		$this->session->set_flashdata('success', 'You sucessfuly logged out!');
 		$this->session->unset_userdata('admin_logged_in');		  
 		redirect('dashboard/login', 'refresh');
+	}
+
+
+	function getTopItems() {
+
+		echo json_encode($this->sales_model->getTopItems(10));
+
+	}
+
+
+	function getSales() {
+		echo json_encode($this->sales_model->getMonthlySales(12));
 	}
 
 
