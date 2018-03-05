@@ -41,6 +41,7 @@
                         </div>
                     </div>
 
+                    <?php if ($pending): ?>
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="card">
@@ -70,6 +71,7 @@
                             </div><!-- /.card -->
                         </div><!-- /.col-lg-12 -->
                     </div><!-- /.row -->
+                    <?php endif ?>
                     <div class="row">
                         <div class="col-lg-12">
                           <?=$this->sessnotif->showNotif()?>
@@ -209,7 +211,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <button type="button" class="btn btn-warning btn-block"><i class="fa fa-cube"></i> SUSPEND SALE</button>
+                                    <button type="button"  data-toggle="modal" data-target="#suspend" class="btn btn-warning btn-block"><i class="fa fa-cube"></i> SUSPEND SALE</button>
                                 </div><!-- /.form-group -->
                                 <?=form_close()?>
                                 </div>
@@ -220,6 +222,37 @@
                 </div>
             </div>
             <!-- /PAGE CONTENT -->
+
+             <!-- Modal -->  
+            <div class="modal fade" id="suspend">
+                    <div class="modal-dialog modal-sm">
+                       <?=form_open('sales/suspend')?>                                                            
+                      <div class="modal-content">
+                        <div class="modal-header">                        
+                        <h4 class="modal-title">Suspend Sale</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span></button>
+                        </div>
+                        <div class="modal-body">                          
+                            <p class="text-center">Are you sure to suspend this sale? <br/>You can update this sale later.</p>
+                            <input type="hidden" name="customer" id="hid_customer" />
+                            <input type="hidden" name="remarks" id="hid_remarks" />
+                            <input type="hidden" name="amt_tendered" id="hid_amt_tendered" />
+                            <input type="hidden" name="senior" id="hid_senior" />
+                            <input type="hidden" name="discount" id="hid_discount" />
+                        </div>
+                        <!-- /.modal-body -->
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                          <button type="submit" class="btn btn-warning btn-flat"><i class="fa fa-cube"></i> Suspend Sale</button>
+                        </div>
+                      </div>
+                      <!-- /.modal-content -->
+                    <?=form_close()?>            
+                </div>
+                    <!-- /.modal-dialog -->
+            </div>
+            <!-- /.Modal -->
 
         </div>
     </div>
@@ -249,6 +282,21 @@
             window.scrollBy(0, height);
 
             var total_amt = <?=array_sum($sub)?>; //the total of cart
+
+            //Hidden fields
+            $('#hid_customer').val($('#customer').val());
+            $('#hid_remarks').val($('#remarks').val());
+            $('#hid_amt_tendered').val($('#amt_tendered').val());
+            $('#hid_senior').val($('#senior').prop("checked"));
+            $('#hid_discount').val($('#loyalty').prop("checked"));
+
+            $('#customer, #remarks, #amt_tendered, #senior, #loyalty').on("change keydown", function() {
+                $('#hid_customer').val($('#customer').val());
+                $('#hid_remarks').val($('#remarks').val());
+                $('#hid_amt_tendered').val($('#amt_tendered').val());
+                $('#hid_senior').val($('#senior').prop("checked"));
+                $('#hid_discount').val($('#loyalty').prop("checked"));
+            });
 
             $('#loyalty').click(function() {
 

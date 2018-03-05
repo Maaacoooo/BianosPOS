@@ -417,6 +417,44 @@ class Sales extends CI_Controller {
 	}
 
 
+	public function suspend()		{
+
+		$userdata = $this->session->userdata('admin_logged_in'); //it's pretty clear it's a userdata
+
+		if($userdata)	{
+			
+			//FORM VALIDATION		 
+			$this->form_validation->set_rules('id', 'ID', 'callback_check_sale');  
+			$this->form_validation->set_rules('customer', 'Customer Name', 'trim|required');  
+			$this->form_validation->set_rules('remarks', 'Remarks', 'trim'); 
+			$this->form_validation->set_rules('amt_tendered', 'Amount Tendered', 'trim|required|decimal'); 
+			
+		   if($this->form_validation->run() == FALSE)	{
+		   		//convert validation errors to flashdata notification
+		          $notif['warning'] = array_values($this->form_validation->error_array());
+		          $this->sessnotif->setNotif($notif);
+		          
+		        redirect($_SERVER['HTTP_REFERER'], 'refresh');
+
+			} else {
+
+				if($this->sales_model->create($userdata['username'])) {
+					
+					$this->session->set_flashdata('success', 'Sale Suspended!');
+					redirect('sales/create/', 'refresh');
+				}
+
+			}
+
+		} else {
+
+			$this->session->set_flashdata('error', 'You need to login!');
+			redirect('dashboard/login', 'refresh');
+		}
+
+	}
+
+
 
 
 	public function add_item()		{
