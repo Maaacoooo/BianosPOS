@@ -619,11 +619,11 @@ class Sales extends CI_Controller {
 
 		     foreach($result as $row) {
 		      	if ($row['batch_id']) {
-		      		$new_row['label']=htmlentities(stripslashes($row['batch_id'] . ' - ' . $row['name'] . ' (In Stock: ' . $row['qty']. ' ' . $row['unit']). ' | SRP:' . $row['srp'] .')');
-	            	$new_row['value']=htmlentities(stripslashes($row['batch_id']));
+		      		$new_row['label']=(stripslashes($row['batch_id'] . ' - ' . $row['name'] . ' (In Stock: ' . $row['qty']. ' ' . $row['unit']). ' | SRP:' . $row['srp'] .')');
+	            	$new_row['value']=(stripslashes($row['batch_id']));
 		      	} else {
-		      		$new_row['label']=htmlentities(stripslashes($row['id'] . ' - ' . $row['name'] . ' (In Stock: ' . $row['qty']. ' ' . $row['unit']). ' | SRP:' . $row['srp'] .')');
-	            	$new_row['value']=htmlentities(stripslashes($row['id']));
+		      		$new_row['label']=(stripslashes($row['id'] . ' - ' . $row['name'] . ' | SRP:' . $row['item_srp']));
+	            	$new_row['value']=(stripslashes($row['id']));
 		      	}
 
 	            $row_set[] = $new_row; //build an array

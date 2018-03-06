@@ -358,15 +358,7 @@ Class Sales_Model extends CI_Model {
 
 
 
-    function autocomplete_items($q) {
-
-            $this->db->group_start();
-            $this->db->like('items.name', $q);
-            $this->db->or_like('items.description', $q);
-            $this->db->or_like('items.serial', $q);
-            $this->db->or_like('items.id', $q);
-            $this->db->or_like('item_inventory.batch_id', $q);
-            $this->db->group_end();
+    function autocomplete_items($q) {            
 
             $this->db->select('
             items.id,
@@ -375,12 +367,25 @@ Class Sales_Model extends CI_Model {
             item_inventory.batch_id,
             item_inventory.qty,
             item_inventory.dp,
-            item_inventory.srp
+            item_inventory.srp,
+            items.srp item_srp,
+            items.dp item_dp,
             ');
 
+            $this->db->group_start();
             $this->db->join('item_inventory', 'item_inventory.item_id = items.id', 'left');
             $this->db->where('item_inventory.qty >', 0);           
             $this->db->or_where('itemS.critical_level', 0);           
+            $this->db->group_end();
+
+            $this->db->group_start();
+            $this->db->like('items.name', $q);
+        
+            $this->db->or_like('items.serial', $q);
+            $this->db->or_like('items.id', $q);
+            $this->db->or_like('item_inventory.batch_id', $q); 
+            $this->db->group_end();
+            
             $this->db->limit(15);
             $query = $this->db->get('items');
             
