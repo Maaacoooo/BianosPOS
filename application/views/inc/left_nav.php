@@ -25,17 +25,13 @@
                     <li><a href="<?=base_url('items/restock_inventory')?>">Restock Inventory</a></li>
                 </ul>
             </li>
-        <?php endif ?>
-        <?php if ($user['usertype'] == 'Administrator'): ?>
             <li>
                 <a href="index.html"><i class="fa fa-list-alt"></i> <span>Sales</span></a>
                 <ul>
                     <li><a href="<?=base_url('sales/create')?>">Sales Register</a></li>
                     <li><a href="<?=base_url('sales')?>">Sales Report</a></li>
                 </ul>
-            </li>
-        <?php endif ?>
-        <?php if ($user['usertype'] == 'Administrator'): ?>    
+            </li>   
             <li>
                 <a href="<?=base_url('imports')?>"><i class="fa fa-cart-arrow-down"></i> <span>Imports</span></a>
             </li>
@@ -48,7 +44,13 @@
             <li>
                 <a href="<?=base_url('users')?>"><i class="fa fa-users"></i> <span>Users</span></a>
             </li>
-
+        <?php else: ?>
+            <li>
+                <a href="<?=base_url('sales/create')?>"><i class="fa fa-shopping-cart"></i> <span>Sales Register</span></a>
+            </li>
+            <li>
+                <a href="<?=base_url('sales')?>"><i class="fa fa-area-chart"></i> <span>Sales</span></a>                
+            </li>
         <?php endif ?>
 
         </ul>

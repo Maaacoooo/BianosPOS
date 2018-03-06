@@ -26,15 +26,15 @@ class Dashboard extends CI_Controller {
 			$data['items'] = $this->inventory_model->critical_inventory();
 
 			$data['passwordverify'] = $this->user_model->check_user($userdata['username'], 'Bianos'); //boolean - returns false if default password
-
-			if($data['user']['usertype'] == 'Administrator') {
-
+			
 			$data['count_inventory'] = $this->item_model->count_items(NULL); 
 			$data['count_users'] = $this->user_model->count_users(NULL);
 			$data['count_sales'] = $this->sales_model->count_sales(NULL, NULL, NULL);
 			$data['count_imports'] = $this->import_model->count_imports(NULL);
 
 			$data['pending'] 	= $this->sales_model->fetch_sales(NULL, NULL, NULL, NULL, 0);
+
+			if($data['user']['usertype'] == 'Administrator') {			
 			
 				$this->load->view('dashboard/dashboard_admin', $data);						
 

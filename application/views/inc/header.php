@@ -12,7 +12,7 @@
             </span>
         </button>
 
-        <a class="navbar-brand logo" href="#">
+        <a class="navbar-brand logo" href="<?=base_url()?>">
             <img src="<?=base_url('assets/images/logo.jpg')?>" alt="Biaños" id="img-cute"> Biaños
         </a>
 
