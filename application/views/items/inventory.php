@@ -77,16 +77,26 @@
                                                 <td><a href="<?=base_url('items/view/'.$res['id'].'/batch/'.$res['batch_id'])?>"><?=$res['name']?></a></td>
                                                 <td><a href="<?=base_url('items/view/'.$res['id'].'/batch/'.$res['batch_id'])?>"><?=$res['unit']?></a></td>
                                                 <td><a href="<?=base_url('items/view/'.$res['id'].'/batch/'.$res['batch_id'])?>"><?=$res['category']?></a></td>
-                                                <td><a href="<?=base_url('items/view/'.$res['id'].'/batch/'.$res['batch_id'])?>"><?=$res['dp_inventory']?></a></td>
-                                                <td><a href="<?=base_url('items/view/'.$res['id'].'/batch/'.$res['batch_id'])?>"><?=$res['srp_inventory']?></a></td>
+                                                <td><a href="<?=base_url('items/view/'.$res['id'].'/batch/'.$res['batch_id'])?>"><?=moneytize($res['dp_inventory'])?></a></td>
+                                                <td><a href="<?=base_url('items/view/'.$res['id'].'/batch/'.$res['batch_id'])?>"><?=moneytize($res['srp_inventory'])?></a></td>
                                                 <td>
-                                                    <a href="<?=base_url('items/view/'.$res['id'].'/batch/'.$res['batch_id'])?>">
-                                                    <?php if ($res['critical_level'] >= $res['qty']): ?>    
-                                                        <span class="badge badge-pill badge-danger"><?=$res['qty']?></span>
+                                                    <a href="<?=base_url('items/view/'.$res['id'])?>">           
+                                                    <?php if ($res['critical_level']): ?>
+                                                        <?php if(!$res['qty']): ?>
+                                                            <span class="badge bg-danger">0</span>
+                                                            <span class="label bg-danger">Restock</span>
+                                                        <?php elseif ($res['critical_level'] >= $res['qty']): ?>
+                                                            <span class="badge bg-danger"><?=$res['qty']?></span>
+                                                            <span class="badge bg-danger">!</span>
+                                                        <?php elseif(($res['critical_level']*1.2) >= $res['qty']): ?>  
+                                                            <span class="badge bg-warning"><?=$res['qty']?></span>
+                                                        <?php else: ?>
+                                                            <span class="badge bg-success"><?=$res['qty']?></span>                                        
+                                                        <?php endif ?>
                                                     <?php else: ?>
-                                                        <?=$res['qty']?>
-                                                    <?php endif ?>
-                                                    </a>
+                                                        <span class="label label-success">Prepared Goods</span>                                    
+                                                    <?php endif ?>                                     
+                                                  </a>
                                                 </td>
                                             </tr>
                                         <?php endforeach ?>

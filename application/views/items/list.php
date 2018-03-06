@@ -85,8 +85,8 @@
                                                 </td>
                                                 <td><a href="<?=base_url('items/view/'.$res['id'])?>"><?=$res['id']?></a></td>
                                                 <td><a href="<?=base_url('items/view/'.$res['id'])?>"><?=$res['name']?></a></td>
-                                                <td><a href="<?=base_url('items/view/'.$res['id'])?>"><?=$res['dp']?></a></td>
-                                                <td><a href="<?=base_url('items/view/'.$res['id'])?>"><?=$res['srp']?></a></td>
+                                                <td><a href="<?=base_url('items/view/'.$res['id'])?>"><?=moneytize($res['dp'])?></a></td>
+                                                <td><a href="<?=base_url('items/view/'.$res['id'])?>"><?=moneytize($res['srp'])?></a></td>
                                                 <td><a href="<?=base_url('items/view/'.$res['id'])?>"><?=$res['unit']?></a></td>
                                                 <td><a href="<?=base_url('items/view/'.$res['id'])?>"><?=$res['category']?></a></td>
                                                 <td>
@@ -98,8 +98,10 @@
                                                         <?php elseif ($res['critical_level'] >= $res['qty']): ?>
                                                             <span class="badge bg-danger"><?=$res['qty']?></span>
                                                             <span class="badge bg-danger">!</span>
-                                                        <?php elseif($res['critical_level'] <= ($res['qty']*1.2)): ?>  
-                                                            <span class="badge bg-warning"><?=$res['qty']?></span>                                                        
+                                                        <?php elseif(($res['critical_level']*1.2) >= $res['qty']): ?>  
+                                                            <span class="badge bg-warning"><?=$res['qty']?></span>
+                                                        <?php else: ?>
+                                                            <span class="badge bg-success"><?=$res['qty']?></span>                                        
                                                         <?php endif ?>
                                                     <?php else: ?>
                                                         <span class="label label-success">Prepared Goods</span>                                    

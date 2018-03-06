@@ -78,11 +78,11 @@
                                         </tr>
                                         <tr>
                                             <th>Dealers Price</th>
-                                            <td><?=$info['dp']?></td>
+                                            <td><?=$batch['dp']?></td>
                                         </tr>
                                         <tr>
                                             <th>Selling Price</th>
-                                            <td><?=$info['srp']?></td>
+                                            <td><?=$batch['srp']?></td>
                                         </tr>
                                         <tr>
                                             <th>Total Stock</th>

@@ -47,7 +47,7 @@
                                     <div class="row">
                                         <div class="col-sm-8">
                                             <div class="form-group">
-                                                <label for="serial">Serial No. Control No.</label>
+                                                <label for="serial">Serial No. / Control No.</label>
                                                 <input type="text" name="serial" class="form-control" id="serial" value="<?=set_value('serial')?>" placeholder="Serial No.">
                                             </div>
                                         </div>
@@ -62,14 +62,14 @@
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label for="dp">Dealers Price</label>
-                                                <input type="number" name="dp" class="form-control" id="dp" value="<?=set_value('dp')?>" placeholder="Dealers Price..."/>
+                                                <input type="number" name="dp" class="form-control integer" id="dp" value="<?=set_value('dp')?>" placeholder="Dealers Price..."/>
                                             </div>
                                         </div>
                                         <!-- /.col-sm-6 -->
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label for="srp">Selling Price</label>
-                                                <input type="number" name="srp" class="form-control" id="srp" value="<?=set_value('srp')?>" placeholder="Selling Price..." required/>  
+                                                <input type="number" name="srp" class="form-control integer" id="srp" value="<?=set_value('srp')?>" placeholder="Selling Price..." required/>  
                                             </div>
                                         </div>
                                         <!-- /.col-sm-6 -->
@@ -169,7 +169,18 @@
 
     <script type="text/javascript" src="<?=base_url('assets/lib/thirdparty/ckeditor/ckeditor.js')?>"></script>
     <?php $this->load->view('inc/js')?>
+    <script type="text/javascript">
+        $('.integer').focusout(function(e) {
+              var value = $(this).val();
+              if(!value) {
 
+              } else {
+                value = parseFloat(value).toFixed(2);
+                $(this).val(value);
+              }
+              
+          });
+    </script>
 
 </body>
 </html>

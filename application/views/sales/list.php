@@ -46,21 +46,11 @@
                                     <div class="form-group">
                                     <h5 class="text-bold card-title">Sales <span class="badge badge-pill badge-default"><?=$total_result?></span>
 
-                                      <div class="row pull-right">
-                                            <div class="col-sm-7">
-                                            <?=form_open('sales', array('method' => 'GET', 'class' => 'input-group input-group-sm pull-left', 'style' => 'width: 250px;'))?>       
-                                            <div class="input-group">
-                                                <div class="input-group-btn">
-                                                    <button type="submit" class="btn btn-info"><i class="fa fa-calendar"></i></button>
-                                                  </div>
-                                                <input type="text" name="date" class="form-control input-sm pull-right" placeholder="Type Date..." id="dateSearch">
-                                            </div>
-                                            <?=form_close()?>
-                                            </div>
-                                            <div class="col-sm-5">
+                                      <div class="row pull-right">                                            
+                                            <div class="col-sm-12">
                                             <?=form_open('sales', array('method' => 'GET'))?>
                                             <div class="input-group">
-                                                <input type="text" name="search" class="form-control" placeholder="Search User...">
+                                                <input type="text" name="search" class="form-control" placeholder="Search...">
                                               <div class="input-group-btn">
                                                 <button type="submit" class="btn btn-info"><i class="fa fa-search"></i></button>
                                               </div>
@@ -97,8 +87,6 @@
                                         </tbody>
                                         <?php endif ?>
                                     </table>
-
-                                    <?=array_sum($sum)?>
 
                                     <div class="footer">
                                         <div class="form-group">
