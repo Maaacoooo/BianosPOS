@@ -385,7 +385,7 @@ $config['encryption_key'] = hex2bin('53dee05b8a8ff935bb11050329d1369b');
 |
 */
 $config['sess_driver'] = 'database';
-$config['sess_cookie_name'] = 'ci_clinic_sess';
+$config['sess_cookie_name'] = 'ci_bianosPOS_sess';
 $config['sess_expiration'] = 7200;
 $config['sess_save_path'] = 'ci_sessions';
 $config['sess_match_ip'] = FALSE;
@@ -456,8 +456,8 @@ $config['global_xss_filtering'] = FALSE;
 | 'csrf_exclude_uris' = Array of URIs which ignore CSRF checks
 */
 $config['csrf_protection'] = TRUE;
-$config['csrf_token_name'] = 'csrf_ci_clinic_token';
-$config['csrf_cookie_name'] = 'csrf_ci_clinic_cookie';
+$config['csrf_token_name'] = 'csrf_bianosPos_token';
+$config['csrf_cookie_name'] = 'csrf_bianosPos_cookie';
 $config['csrf_expire'] = 7200;
 $config['csrf_regenerate'] = TRUE;
 $config['csrf_exclude_uris'] = array();
